@@ -39,6 +39,12 @@ class RoundCreate(BaseModel):
     tees: str
     holes_played: HolesPlayedEnum
 
+class RecommendationRequest(BaseModel):
+    user_id: int
+    location: str
+    max_price: float = 100.0
+    difficulty: str = "any"
+
 
 @app.post("/courses/")
 def create_course(course: CourseCreate, db: Session = Depends(get_db)):
@@ -100,6 +106,54 @@ def get_round(round_id: int, db: Session = Depends(get_db)):
 
     return round
 
+
+@app.get("/recommendations/{user_id}")
+def recommend_courses(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        return {"error": "User not found"}
+    
+    # Get user's past rounds
+    user_rounds = db.query(Round).filter(Round.user_id == user_id).all()
+    user_avg_score = sum([r.score for r in user_rounds]) / len(user_rounds) if user_rounds else 0
+    
+    # Get all courses
+    all_courses = db.query(Course).all()
+    
+    # Simple scoring: courses matching user's difficulty + cheaper options
+    scored = []
+    for course in all_courses:
+        # Skip courses user already played
+        if any(r.course_id == course.id for r in user_rounds):
+            continue
+        
+        score = 50
+        # Favor courses close to user's average score
+        if abs(course.rating - user.handicap) < 3:
+            score += 25
+        # Favor cheaper courses
+        if course.price < 80:
+            score += 15
+        
+        scored.append({"course": course, "score": score})
+    
+    # Sort by score
+    scored.sort(key=lambda x: x["score"], reverse=True)
+    
+    # Return top 5
+    return {
+        "user": user.name,
+        "recommendations": [
+            {
+                "name": s["course"].name,
+                "location": s["course"].location,
+                "price": s["course"].price,
+                "rating": s["course"].rating,
+                "match_score": s["score"]
+            }
+            for s in scored[:5]
+        ]
+    }
 
 if __name__ == "__main__":
     import uvicorn
