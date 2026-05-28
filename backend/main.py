@@ -155,6 +155,39 @@ def recommend_courses(user_id: int, db: Session = Depends(get_db)):
         ]
     }
 
+@app.get("/users/")
+def list_users(db: Session = Depends(get_db)):
+    users = db.query(User).all()
+    return [{"id": u.id, "name": u.name, "handicap": u.handicap} for u in users]
+
+@app.get("/courses/")
+def list_courses(db: Session = Depends(get_db)):
+    courses = db.query(Course).all()
+    return [{"id": c.id, "name": c.name, "location": c.location, "price": c.price, "rating": c.rating} for c in courses]
+
+
+@app.get("/users/{user_id}/stats")
+def user_stats(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        return {"error": "User not found"}
+    
+    rounds = db.query(Round).filter(Round.user_id == user_id).all()
+    
+    if not rounds:
+        return {"name": user.name, "rounds_played": 0, "avg_score": 0}
+    
+    avg_score = sum([r.score for r in rounds]) / len(rounds)
+    best_score = min([r.score for r in rounds])
+    
+    return {
+        "name": user.name,
+        "handicap": user.handicap,
+        "rounds_played": len(rounds),
+        "avg_score": round(avg_score, 1),
+        "best_score": best_score
+    }
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
