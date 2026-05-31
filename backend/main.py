@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from database import engine, get_db, Base
@@ -9,6 +10,15 @@ from enum import Enum
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 
 class UserCreate(BaseModel):
@@ -187,6 +197,28 @@ def user_stats(user_id: int, db: Session = Depends(get_db)):
         "avg_score": round(avg_score, 1),
         "best_score": best_score
     }
+
+@app.get("/rounds/user/{user_id}")
+def get_user_rounds(user_id: int, db: Session = Depends(get_db)):
+    rounds = db.query(Round).filter(Round.id == user_id).all()
+
+    if not rounds:
+        return []
+    
+
+    return [
+        {
+            "id": r.id,
+            "course_id": r.course_id,
+            "score": r.score,
+            "tees": r.tees,
+            "holes_played": r.holes_played,
+            "date": r.date,
+            "course_name": db.query(Course).filter(Course.id == r.course_id).first().name
+        }
+
+        for r in rounds
+    ]
 
 if __name__ == "__main__":
     import uvicorn
