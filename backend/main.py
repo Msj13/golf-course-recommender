@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
+from analytics import get_score_trend
 from database import engine, get_db, Base
 from models import User, Course, Round
 from enum import Enum
@@ -219,6 +220,12 @@ def get_user_rounds(user_id: int, db: Session = Depends(get_db)):
 
         for r in rounds
     ]
+
+@app.get("/analytics/score-trend/{user_id}")
+def get_score_trend_endpoint(user_id: int, db: Session = Depends(get_db)):
+    user_rounds = db.query(Round).filter(Round.user_id == user_id).all()
+
+    return get_score_trend(user_rounds)
 
 if __name__ == "__main__":
     import uvicorn
