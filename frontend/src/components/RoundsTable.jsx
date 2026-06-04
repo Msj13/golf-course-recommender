@@ -1,50 +1,105 @@
 import {useState, useEffect} from 'react'
+import RoundDetail from './RoundDetail';
+import "./RoundsTable.css"
 
 
-export default function RoundsTable() {
+export default function RoundsTable({userId}) {
 
     const [rounds, setRounds] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [selectedRound, setSelectedRound] = useState(null);
 
 
     useEffect(() => {
-        fetch('http://localhost:8000/rounds/user/1')
+        fetch(`http://localhost:8000/rounds/user/${userId}`)
         .then(response => response.json())
         .then(data => {
             setRounds(data)
             setLoading(false)
         })
-    }, [])
+    }, [userId])
 
     if (loading) return <p>Loading rounds...</p>;
+    if (!rounds || rounds.length === 0) return <p>No rounds found</p>;
+
+    const currentRound = rounds[currentIndex];
+    const nextRound = rounds[currentIndex + 1];
+
+    const handleNext = () => {
+      if (currentIndex < rounds.length - 1) {
+        setCurrentIndex(currentIndex + 1);
+      }
+    };
+
+    const handlePrev = () => {
+      if (currentIndex > 0) {
+        setCurrentIndex(currentIndex - 1);
+      }
+    };
 
     return(
-        <div className="bg-white rounded-lg shadow-lg p-8 overflow-x-auto">
-  <h3 className="text-2xl font-bold text-gray-800 mb-6">Recent Rounds</h3>
-  <table className="w-full">
-    <thead>
-      <tr className="border-b-2 border-gray-300">
-        <th className="px-4 py-3 text-left text-gray-700 font-bold">Course Name</th>
-        <th className="px-4 py-3 text-left text-gray-700 font-bold">Score</th>
-        <th className="px-4 py-3 text-left text-gray-700 font-bold">Tees</th>
-        <th className="px-4 py-3 text-left text-gray-700 font-bold">Holes</th>
-        <th className="px-4 py-3 text-left text-gray-700 font-bold">Date</th>
-      </tr>
-    </thead>
-    <tbody>
-      {rounds && rounds.map(round => (
-        <tr key={round.id} className="border-b border-gray-200 hover:bg-gray-50">
-          <td className="px-4 py-4 text-gray-800">{round.course_name}</td>
-          <td className="px-4 py-4 font-bold text-lg">{round.score}</td>
-          <td className="px-4 py-4 text-gray-600">{round.tees}</td>
-          <td className="px-4 py-4 text-gray-600">{round.holes_played}</td>
-          <td className="px-4 py-4 text-gray-600">{new Date(round.date).toLocaleDateString()}</td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
+        <div>
+          <h3>Recent Rounds ({currentIndex + 1} of {rounds.length})</h3>
+          <div className="cards-display">
+            
+            {/* Main Card */}
+            <div className="main-card">
+              <div className="round-card" onClick={() => setSelectedRound(currentRound)}>
+                <div>
+                  <p>Course</p>
+                  <p>{currentRound.course_name}</p>
+                </div>
+                <div>
+                  <p>Score</p>
+                  <p>{currentRound.score}</p>
+                </div>
+                <div>
+                  <p>Tees</p>
+                  <p>{currentRound.tees}</p>
+                </div>
+                <div>
+                  <p>Holes</p>
+                  <p>{currentRound.holes_played}</p>
+                </div>
+                <div>
+                  <p>Date</p>
+                  <p>{new Date(currentRound.date).toLocaleDateString()}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Preview of Next Card */}
+            {nextRound && (
+              <div className="preview-card">
+                <p className="preview-label">Next</p>
+                <div className="round-card preview">
+                  <div>
+                    <p>Course</p>
+                    <p>{nextRound.course_name}</p>
+                  </div>
+                  <div>
+                    <p>Score</p>
+                    <p>{nextRound.score}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Navigation Buttons */}
+          <div className="nav-buttons">
+            <button onClick={handlePrev} disabled={currentIndex === 0}>← Previous</button>
+            <button onClick={handleNext} disabled={currentIndex === rounds.length - 1}>Next →</button>
+          </div>
+
+          {/* Round Detail Card */}
+          {selectedRound && (
+            <RoundDetail
+              roundId={selectedRound.id}
+              onClose={() => setSelectedRound(null)}
+            />
+          )}
+        </div>
     );
-
-
 }
