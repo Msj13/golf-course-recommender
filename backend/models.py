@@ -18,6 +18,9 @@ class User(Base):
     name = Column(String, index=True)
     handicap = Column(Float)
     email = Column(String, unique=True, index=True)
+    home_location = Column(String, nullable=True)
+    budget_per_round = Column(Float, nullable=True)
+    travel_radius_miles = Column(Integer, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationship: A user can have many rounds

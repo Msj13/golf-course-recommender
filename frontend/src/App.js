@@ -1,13 +1,25 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import RoundsTable from './components/RoundsTable';
+import RoundDetail from './components/RoundDetail';
 
 
 function App() {
   return (
-    <div className="App">
-      <Dashboard />
-      <RoundsTable/>
-    </div>
+    <Router>
+      <header>
+        <h1>⛳ Golf Dashboard</h1>
+        <p>Track your rounds, get recommendations</p>
+      </header>
+
+      <main>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/rounds" element={<RoundsTable userId={10}/>} />
+          <Route path="/rounds/:roundId" element={<RoundDetail/>} />
+        </Routes>
+      </main>
+    </Router>
   );
 }
 

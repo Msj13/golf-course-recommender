@@ -1,8 +1,9 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
-from analytics import get_score_trend
+from typing import Optional
+from analytics import get_score_trend, calculate_handicap
 from database import engine, get_db, Base
 from models import User, Course, Round
 from enum import Enum
@@ -26,6 +27,18 @@ class UserCreate(BaseModel):
     name: str
     handicap: float
     email: str
+    home_location: Optional[str] = None
+    budget_per_round: Optional[float] = None
+    travel_radius_miles: Optional[int] = None
+
+
+class UserUpdate(BaseModel):
+    name: Optional[str] = None
+    handicap: Optional[float] = None
+    email: Optional[str] = None
+    home_location: Optional[str] = None
+    budget_per_round: Optional[float] = None
+    travel_radius_miles: Optional[int] = None
 
 
 class CourseCreate(BaseModel):
@@ -86,9 +99,20 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 @app.get("/users/{user_id}")
 def get_user(user_id: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
-
     if not user:
-        return {"Error": "User not found"}
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+
+@app.patch("/users/{user_id}")
+def update_user(user_id: int, updates: UserUpdate, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    for field, value in updates.model_dump(exclude_unset=True).items():
+        setattr(user, field, value)
+    db.commit()
+    db.refresh(user)
     return user
 
 
@@ -110,12 +134,32 @@ def create_round(round: RoundCreate, db: Session = Depends(get_db)):
 
 @app.get("/round/{round_id}")
 def get_round(round_id: int, db: Session = Depends(get_db)):
-    round = db.query(Round).filter(Round.id == round_id).first()
-
-    if not round:
+    db_round = db.query(Round).filter(Round.id == round_id).first() 
+    if not db_round:
         return {"error": "round not found"}
+    
+    user_rounds = db.query(Round).filter(Round.user_id == db_round.user_id).all()
+    course = db.query(Course).filter(Course.id == db_round.course_id).first()
 
-    return round
+
+    handicap = calculate_handicap(user_rounds, db)
+    
+    return {
+        "id": db_round.id,
+        "score": db_round.score,
+        "tees": db_round.tees,
+        "holes_played": db_round.holes_played,
+        "date": db_round.date,
+        "course_name": course.name,
+        "course_location": course.location,
+        "course_length": course.length,
+        "course_par": course.par,
+        "course_rating": course.rating,
+        "course_slope": course.slope,
+        "net_rating": round(db_round.score - course.rating, 1),
+        "handicap": handicap,
+        "vs_par": db_round.score - course.par
+    }
 
 
 @app.get("/recommendations/{user_id}")
@@ -201,7 +245,7 @@ def user_stats(user_id: int, db: Session = Depends(get_db)):
 
 @app.get("/rounds/user/{user_id}")
 def get_user_rounds(user_id: int, db: Session = Depends(get_db)):
-    rounds = db.query(Round).filter(Round.id == user_id).all()
+    rounds = db.query(Round).filter(Round.user_id == user_id).all()
 
     if not rounds:
         return []
@@ -226,6 +270,15 @@ def get_score_trend_endpoint(user_id: int, db: Session = Depends(get_db)):
     user_rounds = db.query(Round).filter(Round.user_id == user_id).all()
 
     return get_score_trend(user_rounds)
+
+@app.get("/analytics/handicap/{user_id}")
+def get_handicap(user_id: int, db: Session = Depends(get_db)):
+    user_rounds = db.query(Round).filter(Round.user_id == user_id).all()
+
+    handicap = calculate_handicap(user_rounds, db)
+
+    return {"handicap": handicap}
+
 
 if __name__ == "__main__":
     import uvicorn
