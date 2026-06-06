@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import './Dashboard.css';
 
 export default function Dashboard() {
@@ -9,7 +10,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userResponse = await fetch('http://localhost:8000/users/1');
+        const userResponse = await fetch('http://localhost:8000/users/2');
         const userData = await userResponse.json();
         setUser(userData);
   
@@ -35,6 +36,11 @@ export default function Dashboard() {
       
       {user && (
         <div className="user-card">
+          <Link to="/profile" style={ {textDecoration: 'none'} }>
+            <div className="avatar">
+              <p>{user.name.split(" ").map(word => word[0]).join("").slice(0, 2)}</p>
+            </div>
+          </Link>
           <h2>{user.name}</h2>
           <div className="user-info">
             <div>

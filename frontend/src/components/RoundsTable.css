@@ -1,7 +1,7 @@
 .cards-display {
   display: flex;
-  gap: 2rem;
-  margin: 2rem 0;
+  gap: var(--space-8);
+  margin: var(--space-8) 0;
   align-items: flex-start;
 }
 
@@ -14,11 +14,11 @@
 }
 
 .round-card {
-  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
+  background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-bg) 100%);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-border);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -31,9 +31,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-6);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .round-card div:last-child {
@@ -47,27 +47,27 @@
 }
 
 .round-card p:first-child {
-  font-size: 0.875rem;
-  color: #6b7280;
-  font-weight: 500;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-weight: var(--font-medium);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   min-width: 80px;
 }
 
 .round-card p:last-child {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
 }
 
 .preview-label {
-  font-size: 0.75rem;
-  color: #9ca3af;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  font-weight: 600;
-  margin-bottom: 1rem;
+  font-weight: var(--font-semibold);
+  margin-bottom: var(--space-4);
 }
 
 .round-card.preview {
@@ -75,25 +75,25 @@
 }
 
 h3 {
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0 0 1rem 0;
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  margin: 0 0 var(--space-4) 0;
 }
 
 .nav-buttons {
   display: flex;
-  gap: 1rem;
+  gap: var(--space-4);
   justify-content: center;
 }
 
 .nav-buttons button {
-  padding: 0.75rem 1.5rem;
+  padding: var(--space-3) var(--space-6);
   border: none;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
   color: white;
-  font-weight: 600;
+  font-weight: var(--font-semibold);
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(21, 128, 61, 0.3);
