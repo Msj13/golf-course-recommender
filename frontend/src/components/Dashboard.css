@@ -25,6 +25,12 @@
   margin-bottom: var(--space-4);
 }
 
+.welcome-message {
+  font: var(--font-sans);
+  gap: 10px
+}
+
+
 .user-info {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -104,7 +110,7 @@
 .avatar {
   width: 56px;
   height: 56px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-md);
   background-color: var(--color-primary);
   color: white;
   display: flex;

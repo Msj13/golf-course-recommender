@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { House } from 'lucide-react';
 import './Dashboard.css';
 
 export default function Dashboard() {
@@ -10,7 +11,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userResponse = await fetch('http://localhost:8000/users/2');
+        const userResponse = await fetch('http://localhost:8000/users/1');
         const userData = await userResponse.json();
         setUser(userData);
   
@@ -32,8 +33,11 @@ export default function Dashboard() {
   
   return (
     <div className="dashboard">
-      <h1>Golf Dashboard</h1>
-      
+
+      <div className='welcome-message'>
+        <h1>Welcome back, {user.name}</h1>
+        <p>Here's how your game is trending this season.</p>
+      </div>
       {user && (
         <div className="user-card">
           <Link to="/profile" style={ {textDecoration: 'none'} }>
@@ -42,6 +46,7 @@ export default function Dashboard() {
             </div>
           </Link>
           <h2>{user.name}</h2>
+          <div>{user.home_location}</div>
           <div className="user-info">
             <div>
               <p className="label">Handicap</p>

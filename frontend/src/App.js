@@ -3,19 +3,18 @@ import Dashboard from './components/Dashboard';
 import RoundsTable from './components/RoundsTable';
 import RoundDetail from './components/RoundDetail';
 import Profile from './components/Profile';
+import NavBar from './components/NavBar'
 
 
 function App() {
   return (
     <Router>
-      <header>
-        <h1>⛳ Golf Dashboard</h1>
-        <p>Track your rounds, get recommendations</p>
-      </header>
+
+      <NavBar/>
 
       <main>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/rounds" element={<RoundsTable userId={10}/>} />
           <Route path="/rounds/:roundId" element={<RoundDetail/>} />
           <Route path="/profile" element={<Profile />} />
