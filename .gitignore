@@ -5,6 +5,11 @@ backend/*.pyc
 backend/.env
 backend/.DS_Store
 
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
 # Node/React
 frontend/node_modules/
 frontend/build/

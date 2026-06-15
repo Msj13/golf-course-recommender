@@ -1,0 +1,83 @@
+.score-card-container {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.score-card-data {
+  background-color: var(--color-primary-dark);
+  padding: var(--space-6) var(--space-4);
+  color: white;
+}
+
+.hero-score {
+  font-size: 64px;
+  font-weight: var(--font-medium);
+  margin: 0;
+  line-height: 1;
+}
+
+.hero-meta {
+  font-size: var(--text-xs);
+  opacity: 0.7;
+  margin: var(--space-1) 0;
+}
+
+.score-card-analytics {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.stat-value {
+  font-size: var(--text-xl);
+  font-weight: var(--font-medium);
+  color: var(--color-text);
+  margin: var(--space-1) 0 0 0;
+}
+
+.score-card-course {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-4);
+  gap: var(--space-4);
+}
+
+.course-label {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.course-value {
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: var(--color-text);
+  margin: var(--space-1) 0 0 0;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
